@@ -13,7 +13,8 @@
 
 * Automated table creation, dropping, and re-creation to ensure clean data imports
 
-  #### import_mongo.py
+#### import_mongo.py
+##### Key Missions:
 
 * Connection to a MongoDB database using the PyMongo library
 
