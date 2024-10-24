@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  postgres_db:
+    image: postgres:latest
+    container_name: PostgresCont
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD="xxxxxxxxxxxxxxxxxxxxxxxxxx"
+      - POSTGRES_DB=octobre1
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - postgres_db:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    networks:
+      - esther_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD="xxxxxxxxxxxxxxxxxxxxxxxxxx"
+      - DATABASE_HOST=postgres_db
+      - DATABASE_NAME=octobre1
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    working_dir: /app
+    networks:
+      - esther_network
+    command: /bin/sh -c "python import2.py && tail -f /dev/null"
+    restart: "no"
+
+networks:
+  esther_network:
+
+volumes:
+  postgres_db:
+    driver: local
